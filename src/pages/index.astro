@@ -1,13 +1,481 @@
 ---
-import { marked } from "marked";
 import Base from "../layouts/Base.astro";
-import { site, getPage } from "../site";
+import { site } from "../site";
 
-const home = getPage("/") ?? site.pages[0];
-const html = marked.parse(home.content) as string;
+// ---- Menu data (three-letter codes are the brand's signature) ----
+const sandwiches = [
+  { code: "B.E.C.", desc: "Maple wood smoked mushrooms, tofu over easy, cheddar, yolk sauce on a roll.", tag: "GFO" },
+  { code: "S.E.C.", desc: "House-made seitan, tofu over easy, cheddar, yolk sauce on a roll.", tag: "" },
+  { code: "H.E.C.", desc: "Smoked yuba, tofu over easy, cheddar, yolk sauce on a roll.", tag: "GFO" },
+  { code: "P.E.C.", desc: "Smoked seitan pastrami, tofu over easy, cheese, yolk sauce on a roll.", tag: "" },
+  { code: "V.E.G.", desc: "Tofu over easy, cheddar, avocado, tomato, greens, fancy aioli on a roll.", tag: "GFO" },
+  { code: "E.N.C.", desc: "Tofu over easy, cheddar, yolk sauce on a roll.", tag: "GFO" },
+  { code: "B.L.T.", desc: "Smoked mushrooms, tomato, avocado, greens, lemon herb mayo on sourdough or whole wheat.", tag: "GFO" },
+  { code: "R.B.N.", desc: "Smoked seitan pastrami, cheese, sauerkraut, russian dressing on griddled rye.", tag: "" },
+  { code: "C.H.P.", desc: "Chopped Beyond, cheddar, grilled onions, tomato, pickled peppers, greens, special sauce on a hero.", tag: "GFO" },
+  { code: "P.T.Y.", desc: "Beyond patty, cheese, grilled onions on griddled rye with a side of special sauce.", tag: "" },
+  { code: "M.L.T.", desc: "TNA salad, cheddar, tomato, Old Bay on griddled sourdough or whole wheat.", tag: "" },
+  { code: "C.B.N.", desc: "Slow roasted tofu, smoked yuba, cheese, pickles, mojo, mustard on a pressed hero.", tag: "" },
+  { code: "C.L.B.", desc: "Smoked mushrooms, peppered seitan, tomato, greens, mayo on sourdough or whole wheat.", tag: "" },
+  { code: "T.N.A.", desc: "TNA salad, tomato, greens, mayo on sourdough or whole wheat.", tag: "GFO" },
+  { code: "E.G.G.", desc: "Tofu salad, tomato, greens, fresh herbs on sourdough or whole wheat.", tag: "GFO" },
+];
+const salads = [
+  { code: "GREENS", desc: "Mixed greens, shallot vinaigrette.", tag: "GF" },
+  { code: "CAESAR", desc: "Romaine, baby kale, croutons, pepita parm, house caesar dressing.", tag: "GF" },
+  { code: "COBB", desc: "Romaine, mushroom bits, peppered seitan, tofu salad, avocado, tomato, cucumber, red onion, bleu cheese, red wine vinaigrette.", tag: "" },
+];
+const shares = [
+  { code: "CHOPPED CHEESE FRIES", desc: "Fries loaded with chopped Beyond patty, vegan cheddar, grilled onion, spicy pickled peppers, tomato, special sauce, scallions.", tag: "GF" },
+  { code: "REUBEN FRIES", desc: "Fries loaded with seitan pastrami, vegan cheese, sauerkraut, russian dressing, scallions.", tag: "" },
+];
+const sides = [
+  { code: "FRENCH FRIES", desc: "Handcut daily.", tag: "GF" },
+  { code: "TOFU SALAD", desc: "Eggy tofu, fresh herbs.", tag: "GF" },
+  { code: "TNA SALAD", desc: "Tofu, chickpeas, hearts of palm, celery, onion, herbs.", tag: "GF" },
+  { code: "POTATO SALAD", desc: "With tofu, celery, scallions, herbs.", tag: "GF" },
+  { code: "MACARONI SALAD", desc: "Bell pepper, celery, onion, parsley.", tag: "" },
+  { code: "BEAN SALAD", desc: "Kidneys, chickpeas, celery, cucumber, onion, herbs, lemon dressing.", tag: "GF" },
+  { code: "CAULIFLOWER SALAD", desc: "Capers, parsley, mustard dressing.", tag: "GF" },
+  { code: "HOUSEMADE PICKLES", desc: "Dill, spicy, or extra spicy.", tag: "GF" },
+];
+
+const order = [
+  { app: "UBER EATS", note: "Full menu", href: "#" },
+  { app: "GRUBHUB", note: "Full menu", href: "#" },
+  { app: "DOORDASH", note: "Limited menu", href: "#" },
+];
+
+const mapSrc = "https://maps.google.com/maps?q=525+DeKalb+Ave,+Brooklyn,+NY+11205&z=15&output=embed";
 ---
-<Base title={home.title} description={site.site.description} pageSlug="/">
-  <h1>{site.site.name}</h1>
-  <p class="tagline">{site.site.tagline}</p>
-  <article set:html={html} />
+<Base title={site.pages[0].title} description={site.site.description} pageSlug="/" bare>
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500;600;700&family=Spectral:ital,wght@0,500;1,400;1,500&display=swap"
+      rel="stylesheet"
+    />
+  </Fragment>
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav">
+    <a class="brand" href="#top"><img src="/media/logo.webp" alt="A.T.M. Vegan Deli" width="1500" height="606" /></a>
+    <nav class="nav-links">
+      <a href="#order">Order</a>
+      <a href="#menu">Menu</a>
+      <a href="#story">Story</a>
+      <a href="#visit">Visit</a>
+    </nav>
+    <a class="btn btn-y nav-cta" href="#order">Order &rarr;</a>
+  </header>
+
+  <main id="top">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="hero-grid wrap">
+        <div class="hero-copy">
+          <span class="kicker reveal" style="--d:0ms">Brooklyn &middot; Est. plant-based</span>
+          <h1 class="reveal" style="--d:80ms">
+            <span class="ln">NYC DELI</span>
+            <span class="ln">EATS.</span>
+            <span class="ln red">100% PLANT&#8209;BASED.</span>
+          </h1>
+          <p class="lede reveal" style="--d:170ms">
+            The best vegan breakfast sandwich on the planet &mdash; a real
+            New York deli where the bacon, the egg, the cheese and the
+            pastrami are all made from plants.
+          </p>
+          <div class="cta-row reveal" style="--d:250ms">
+            <a class="btn btn-y" href="#order">Order now &rarr;</a>
+            <a class="btn btn-line" href="#menu">See the menu</a>
+          </div>
+        </div>
+        <figure class="hero-fig reveal" style="--d:160ms">
+          <div class="gingham-pad" aria-hidden="true"></div>
+          <img src="/media/hero-sandwich.webp" alt="A.T.M.'s signature B.E.C. — maplewood smoked mushroom bacon, over-easy tofu egg, vegan cheddar and yolk sauce on a roll." width="1500" height="773" loading="eager" />
+          <figcaption><b>B.E.C.</b> &mdash; the one that started it all</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="gingham-strip" aria-hidden="true"></div>
+
+    <!-- ===================== ORDER ===================== -->
+    <section id="order" class="order wrap">
+      <h2 class="block-title">ORDER FOOD<br /><span class="red">FOR DELIVERY</span></h2>
+      <div class="order-grid">
+        {order.map((o) => (
+          <a class="order-btn" href={o.href} target="_blank" rel="noopener">
+            <span class="ob-app">{o.app}</span>
+            <span class="ob-note">{o.note}</span>
+          </a>
+        ))}
+      </div>
+      <div class="takeout">
+        <p class="takeout-label">For take-out orders, please call</p>
+        <a class="btn btn-y btn-big" href="tel:+16466703894">646&middot;670&middot;3894</a>
+        <p class="takeout-sub">Walk-ins always welcome during open hours.</p>
+      </div>
+    </section>
+
+    <div class="gingham-strip" aria-hidden="true"></div>
+
+    <!-- ===================== STORY ===================== -->
+    <section id="story" class="story wrap">
+      <h2 class="block-title center">A DELI FOR<br /><span class="red">EVERYONE</span></h2>
+      <div class="story-cols">
+        <p>
+          A.T.M. Vegan Deli took the classic New York deli &mdash; the griddle,
+          the ticket counter, the overstuffed hero &mdash; and rebuilt it from
+          scratch with whole-food ingredients, house-made proteins and a serious
+          amount of technique. It tastes like the deli you grew up on. It just
+          happens to be 100% vegan.
+        </p>
+        <p>
+          Our menu runs on three-letter codes &mdash; <b>B.E.C.</b>,
+          <b>R.B.N.</b>, <b>C.H.P.</b>, <b>T.N.A.</b> &mdash; a wink at deli
+          shorthand and the old bacon-egg-and-cheese ticket tradition. Each code
+          is a whole meal waiting to happen. Come hungry.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== MENU ===================== -->
+    <section id="menu" class="menu">
+      <div class="wrap">
+        <header class="menu-head">
+          <h2 class="big-outline">MENU</h2>
+          <p class="menu-sub">Everything is 100% plant-based, always.</p>
+        </header>
+
+        <div class="group">
+          <h3 class="group-title">SANDWICHES</h3>
+          <ul class="items">
+            {sandwiches.map((i) => (
+              <li class="mi">
+                <div class="lead">
+                  <span class="nm">{i.code}</span>
+                  <span class="dots" aria-hidden="true"></span>
+                  {i.tag && <span class="tag">{i.tag}</span>}
+                </div>
+                <p class="desc">{i.desc}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="group-cols">
+          <div class="group">
+            <h3 class="group-title">SALADS</h3>
+            <ul class="items">
+              {salads.map((i) => (
+                <li class="mi">
+                  <div class="lead">
+                    <span class="nm">{i.code}</span>
+                    <span class="dots" aria-hidden="true"></span>
+                    {i.tag && <span class="tag">{i.tag}</span>}
+                  </div>
+                  <p class="desc">{i.desc}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="group">
+            <h3 class="group-title">SHARES</h3>
+            <ul class="items">
+              {shares.map((i) => (
+                <li class="mi">
+                  <div class="lead">
+                    <span class="nm nm-sm">{i.code}</span>
+                    <span class="dots" aria-hidden="true"></span>
+                    {i.tag && <span class="tag">{i.tag}</span>}
+                  </div>
+                  <p class="desc">{i.desc}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3 class="group-title">SIDES</h3>
+          <ul class="items sides">
+            {sides.map((i) => (
+              <li class="mi">
+                <div class="lead">
+                  <span class="nm nm-sm">{i.code}</span>
+                  <span class="dots" aria-hidden="true"></span>
+                  {i.tag && <span class="tag">{i.tag}</span>}
+                </div>
+                <p class="desc">{i.desc}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p class="legend">GF = gluten-free &nbsp;&middot;&nbsp; GFO = gluten-free option available &nbsp;&middot;&nbsp; All plant-based.</p>
+      </div>
+    </section>
+
+    <div class="gingham-strip" aria-hidden="true"></div>
+
+    <!-- ===================== VISIT ===================== -->
+    <section id="visit" class="visit wrap">
+      <div class="visit-grid">
+        <div class="visit-info">
+          <h2 class="block-title">525 DEKALB<br /><span class="red">AVE</span></h2>
+          <p class="visit-addr">Brooklyn, NY 11205 &mdash; Clinton Hill / Bed-Stuy</p>
+          <dl class="hours">
+            <div class="lead"><dt>MON &ndash; FRI</dt><span class="dots" aria-hidden="true"></span><dd>8:00a &ndash; 3:00p</dd></div>
+            <div class="lead"><dt>SAT &ndash; SUN</dt><span class="dots" aria-hidden="true"></span><dd>10:00a &ndash; 4:00p</dd></div>
+          </dl>
+          <a class="btn btn-y btn-big" href="tel:+16466703894">Call &middot; 646&middot;670&middot;3894</a>
+        </div>
+        <figure class="map-fig">
+          <iframe
+            title="Map to A.T.M. Vegan Deli, 525 DeKalb Ave, Brooklyn, NY 11205"
+            src={mapSrc}
+            width="100%" height="100%"
+            style="border:0;display:block;"
+            allowfullscreen loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="foot">
+      <div class="gingham-strip" aria-hidden="true"></div>
+      <div class="wrap foot-grid">
+        <span class="foot-mark">A<span class="r">.</span>T<span class="r">.</span>M<span class="r">.</span> <em>Vegan Deli</em></span>
+        <nav class="foot-links">
+          <a href="https://instagram.com/a.t.m.vegandeli" target="_blank" rel="noopener">Instagram</a>
+          <a href="#" target="_blank" rel="noopener">Shop</a>
+          <a href="tel:+16466703894">646&middot;670&middot;3894</a>
+        </nav>
+        <p class="foot-meta">525 DeKalb Ave, Brooklyn NY 11205 &middot; &copy; {new Date().getFullYear()} A.T.M. Vegan Deli</p>
+      </div>
+    </footer>
+  </main>
+
+  <style is:global>
+    :root {
+      --red:      #E0231A;
+      --red-dark: #B5170F;
+      --yellow:   #FFD400;
+      --ink:      #15110D;
+      --paper:    #FFFFFF;
+      --muted:    #6B645C;
+      --gh:       13px; /* gingham cell */
+
+      --display: "Anton", "Arial Narrow", sans-serif;
+      --cond: "Oswald", "Arial Narrow", system-ui, sans-serif;
+      --serif: "Spectral", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--cond);
+      font-weight: 400;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    ::selection { background: var(--yellow); color: var(--ink); }
+    .wrap { width: min(1140px, 92vw); margin: 0 auto; }
+
+    /* ---------- gingham motifs ---------- */
+    .gingham-strip {
+      height: 26px; width: 100%;
+      background-color: #fff;
+      background-image:
+        repeating-linear-gradient(90deg, transparent 0 var(--gh), rgba(224,35,26,.42) 0 calc(var(--gh) * 2)),
+        repeating-linear-gradient(0deg, transparent 0 var(--gh), rgba(224,35,26,.42) 0 calc(var(--gh) * 2));
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+    }
+
+    /* ---------- type primitives ---------- */
+    .kicker {
+      display: inline-block; font-family: var(--cond); font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.26em; text-transform: uppercase;
+      color: #fff; background: var(--red); padding: 0.35rem 0.7rem; margin-bottom: 1.4rem;
+    }
+    .red { color: var(--red); }
+
+    .block-title {
+      font-family: var(--display); font-weight: 400;
+      font-size: clamp(2.6rem, 6.5vw, 5rem); line-height: 1.0;
+      letter-spacing: 0.005em; text-transform: uppercase; margin: 0 0 1.6rem;
+      color: var(--ink);
+      text-shadow: 4px 4px 0 var(--red);
+    }
+    .block-title.center { text-align: center; }
+    .block-title .red { color: var(--red); text-shadow: 4px 4px 0 var(--ink); }
+
+    .big-outline {
+      font-family: var(--display); font-weight: 400; text-transform: uppercase;
+      font-size: clamp(4rem, 16vw, 11rem); line-height: 0.85; margin: 0; text-align: center;
+      color: transparent; -webkit-text-stroke: 3px var(--red); letter-spacing: 0.02em;
+    }
+
+    /* ---------- buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--cond); font-weight: 700; font-size: 0.92rem;
+      letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+      padding: 0.85rem 1.6rem; border: 2.5px solid var(--ink); color: var(--ink);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, color 0.14s ease;
+    }
+    .btn-y { background: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
+    .btn-y:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--red); }
+    .btn-line { background: #fff; box-shadow: 4px 4px 0 var(--red); }
+    .btn-line:hover { background: var(--ink); color: #fff; transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--red); }
+    .btn-big { font-size: 1.2rem; padding: 1rem 2rem; letter-spacing: 0.1em; }
+
+    /* ---------- nav ---------- */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+      padding: 0.7rem clamp(1rem, 4vw, 2.4rem);
+      background: rgba(255,255,255,0.94); backdrop-filter: blur(6px);
+      border-bottom: 2.5px solid var(--ink);
+    }
+    .nav .brand img { height: 38px; width: auto; }
+    .nav-links { display: flex; gap: clamp(1rem, 3vw, 2.4rem); }
+    .nav-links a {
+      font-family: var(--cond); font-weight: 600; font-size: 0.82rem;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none;
+      position: relative; padding: 0.3rem 0;
+    }
+    .nav-links a::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--red); transition: width 0.22s ease; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta { padding: 0.55rem 1.1rem; font-size: 0.8rem; box-shadow: 3px 3px 0 var(--ink); }
+
+    /* ---------- hero ---------- */
+    .hero { padding: clamp(2.5rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3.5rem); }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+    .hero h1 {
+      font-family: var(--display); font-weight: 400; text-transform: uppercase;
+      font-size: clamp(2.9rem, 7.4vw, 5.8rem); line-height: 1.02; letter-spacing: 0.01em; margin: 0 0 1.6rem;
+    }
+    .hero h1 .ln { display: block; }
+    .hero h1 .ln { color: var(--ink); text-shadow: 5px 5px 0 var(--red); }
+    .hero h1 .ln.red { color: var(--red); text-shadow: 5px 5px 0 var(--ink); }
+    .lede { font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem, 1.7vw, 1.35rem); line-height: 1.5; color: #2a241e; max-width: 34ch; margin: 0 0 2rem; }
+    .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .hero-fig { margin: 0; position: relative; }
+    .gingham-pad {
+      position: absolute; inset: auto -6% -8% auto; width: 62%; height: 70%; z-index: 0;
+      background-image:
+        repeating-linear-gradient(90deg, transparent 0 var(--gh), rgba(224,35,26,.4) 0 calc(var(--gh) * 2)),
+        repeating-linear-gradient(0deg, transparent 0 var(--gh), rgba(224,35,26,.4) 0 calc(var(--gh) * 2));
+      border: 2.5px solid var(--ink);
+    }
+    .hero-fig img { position: relative; z-index: 1; width: 100%; border: 2.5px solid var(--ink); background: #fff; }
+    .hero-fig figcaption { font-family: var(--serif); font-style: italic; font-size: 0.95rem; color: var(--muted); margin-top: 0.9rem; position: relative; z-index: 1; }
+    .hero-fig figcaption b { font-family: var(--cond); font-style: normal; font-weight: 700; letter-spacing: 0.06em; color: var(--red); }
+
+    /* ---------- order ---------- */
+    .order { padding: clamp(3rem, 6vw, 5rem) 0 clamp(2.5rem, 5vw, 4rem); text-align: center; }
+    .order .block-title { text-align: center; }
+    .order-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; margin: 2.4rem 0 3rem; }
+    .order-btn {
+      background: var(--yellow); border: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
+      text-decoration: none; color: var(--ink); padding: 1.8rem 1rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+    .order-btn:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--red); }
+    .ob-app { font-family: var(--display); font-size: 1.7rem; letter-spacing: 0.02em; text-transform: uppercase; }
+    .ob-note { font-family: var(--cond); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red-dark); }
+    .takeout-label { font-family: var(--cond); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 1.2rem; }
+    .takeout .btn-big { box-shadow: 5px 5px 0 var(--red); }
+    .takeout-sub { font-family: var(--serif); font-style: italic; color: var(--muted); margin: 1.2rem 0 0; }
+
+    /* ---------- story ---------- */
+    .story { padding: clamp(3rem, 7vw, 6rem) 0; }
+    .story-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6rem; max-width: 920px; margin: 0 auto; }
+    .story-cols p { font-family: var(--serif); font-size: 1.12rem; line-height: 1.6; margin: 0; color: #241f1a; }
+    .story-cols b { font-family: var(--cond); font-weight: 700; font-style: normal; color: var(--red); letter-spacing: 0.04em; }
+
+    /* ---------- menu ---------- */
+    .menu { padding: clamp(2rem, 4vw, 3.5rem) 0 clamp(3rem, 6vw, 5rem); }
+    .menu-head { text-align: center; margin-bottom: 2.6rem; }
+    .menu-sub { font-family: var(--cond); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 0.6rem 0 0; }
+    .group { margin-bottom: 2.8rem; }
+    .group-title {
+      font-family: var(--display); font-weight: 400; text-transform: uppercase;
+      font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1; margin: 0 0 1.2rem;
+      color: transparent; -webkit-text-stroke: 2px var(--red); letter-spacing: 0.02em;
+    }
+    .items { list-style: none; margin: 0; padding: 0; }
+    .group-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6rem; }
+    .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.6rem; }
+    .mi { padding: 0.75rem 0; border-bottom: 2px solid #f0e9e2; }
+    .lead { display: flex; align-items: baseline; gap: 0.4rem; }
+    .nm {
+      font-family: var(--cond); font-weight: 700; font-size: 1.18rem;
+      letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink); white-space: nowrap;
+    }
+    .nm-sm { font-size: 1.02rem; white-space: normal; }
+    .dots { flex: 1 1 auto; border-bottom: 2.5px dotted #c9bdb0; transform: translateY(-0.28em); min-width: 1.5rem; }
+    .tag {
+      font-family: var(--cond); font-weight: 700; font-size: 0.68rem; letter-spacing: 0.1em;
+      color: #fff; background: var(--red); padding: 0.12rem 0.45rem; white-space: nowrap;
+    }
+    .desc { font-family: var(--serif); font-style: italic; font-size: 0.98rem; line-height: 1.4; color: #4a423a; margin: 0.25rem 0 0; }
+    .legend { font-family: var(--cond); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; margin: 2.4rem 0 0; }
+
+    /* ---------- visit ---------- */
+    .visit { padding: clamp(3rem, 6vw, 5rem) 0; }
+    .visit-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(2rem, 5vw, 4rem); align-items: stretch; }
+    .visit-info { display: flex; flex-direction: column; align-items: flex-start; }
+    .visit-addr { font-family: var(--serif); font-style: italic; font-size: 1.15rem; color: var(--muted); margin: 0 0 1.8rem; }
+    .hours { width: 100%; max-width: 26rem; margin: 0 0 2rem; }
+    .hours .lead { padding: 0.6rem 0; border-bottom: 2px solid #f0e9e2; }
+    .hours dt { font-family: var(--cond); font-weight: 700; font-size: 0.92rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 0; }
+    .hours dd { font-family: var(--cond); font-weight: 600; font-size: 1.05rem; margin: 0; color: var(--red); white-space: nowrap; }
+    .map-fig { margin: 0; min-height: 360px; border: 2.5px solid var(--ink); box-shadow: 8px 8px 0 var(--red); overflow: hidden; }
+
+    /* ---------- footer ---------- */
+    .foot { margin-top: 1rem; }
+    .foot .gingham-strip { margin-bottom: 2.4rem; }
+    .foot-grid { display: flex; align-items: center; justify-content: space-between; gap: 1.4rem; flex-wrap: wrap; padding-bottom: 2.6rem; }
+    .foot-mark { font-family: var(--display); font-size: 1.5rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); }
+    .foot-mark .r { color: var(--red); }
+    .foot-mark em { font-family: var(--serif); font-style: italic; font-size: 1rem; text-transform: none; color: var(--muted); letter-spacing: 0; }
+    .foot-links { display: flex; gap: 1.6rem; }
+    .foot-links a { font-family: var(--cond); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+    .foot-links a:hover { color: var(--red); }
+    .foot-meta { font-family: var(--cond); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--muted); margin: 0; width: 100%; text-align: center; padding-top: 1.4rem; border-top: 2px solid #f0e9e2; }
+
+    /* ---------- reveal ---------- */
+    .reveal { opacity: 0; transform: translateY(16px); animation: fadeUp 0.65s cubic-bezier(0.22,1,0.36,1) forwards; animation-delay: var(--d, 0ms); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 880px) {
+      .nav-links { display: none; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-fig { order: -1; }
+      .story-cols { grid-template-columns: 1fr; gap: 1.4rem; }
+      .order-grid { grid-template-columns: 1fr; }
+      .group-cols { grid-template-columns: 1fr; gap: 0; }
+      .sides { grid-template-columns: 1fr; gap: 0; }
+      .visit-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { animation: none; opacity: 1; transform: none; }
+    }
+  </style>
 </Base>
