@@ -29,6 +29,12 @@ const jsonLd: Record<string, unknown> = {
 };
 
 const navPages = getNonHomePages();
+
+// Social share image (absolute URL required by OG/Twitter). Falls back to a
+// site-relative path so it still resolves on preview deployments.
+const ogImagePath = "/media/hero-sandwich.webp";
+const ogImage = site.site.url ? new URL(ogImagePath, site.site.url).toString() : ogImagePath;
+const ogImageAlt = `${site.site.name} — the signature B.E.C. vegan breakfast sandwich`;
 ---
 <!doctype html>
 <html lang="en" data-theme={site.theme.mode}>
@@ -38,16 +44,28 @@ const navPages = getNonHomePages();
     <title>{fullTitle}</title>
     <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#E0231A" />
+    <meta name="geo.region" content="US-NY" />
+    <meta name="geo.placename" content="Brooklyn, New York" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
 
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={site.site.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={ogImageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <link rel="alternate" type="application/json" href="/api/site.json" title={`${site.site.name} content (machine-readable)`} />
     <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly site guide" />

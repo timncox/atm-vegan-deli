@@ -58,6 +58,8 @@ const mapSrc = "https://maps.google.com/maps?q=525+DeKalb+Ave,+Brooklyn,+NY+1120
     />
   </Fragment>
 
+  <a class="skip-link" href="#top">Skip to content</a>
+
   <!-- ===================== NAV ===================== -->
   <header class="nav">
     <a class="brand" href="#top"><img src="/media/logo.webp" alt="A.T.M. Vegan Deli" width="1500" height="606" /></a>
@@ -92,8 +94,10 @@ const mapSrc = "https://maps.google.com/maps?q=525+DeKalb+Ave,+Brooklyn,+NY+1120
           </div>
         </div>
         <figure class="hero-fig reveal" style="--d:160ms">
-          <div class="gingham-pad" aria-hidden="true"></div>
-          <img src="/media/hero-sandwich.webp" alt="A.T.M.'s signature B.E.C. — maplewood smoked mushroom bacon, over-easy tofu egg, vegan cheddar and yolk sauce on a roll." width="1500" height="773" loading="eager" />
+          <div class="hero-img-wrap">
+            <div class="gingham-pad" aria-hidden="true"></div>
+            <img src="/media/hero-sandwich.webp" alt="A.T.M.'s signature B.E.C. — maplewood smoked mushroom bacon, over-easy tofu egg, vegan cheddar and yolk sauce on a roll." width="1500" height="773" loading="eager" />
+          </div>
           <figcaption><b>B.E.C.</b> &mdash; the one that started it all</figcaption>
         </figure>
       </div>
@@ -291,6 +295,22 @@ const mapSrc = "https://maps.google.com/maps?q=525+DeKalb+Ave,+Brooklyn,+NY+1120
     ::selection { background: var(--yellow); color: var(--ink); }
     .wrap { width: min(1140px, 92vw); margin: 0 auto; }
 
+    /* ---------- accessibility ---------- */
+    .skip-link {
+      position: absolute; left: 0.75rem; top: -3.5rem; z-index: 200;
+      background: var(--ink); color: #fff; font-family: var(--cond); font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.85rem;
+      padding: 0.7rem 1.1rem; text-decoration: none; border: 2.5px solid var(--yellow);
+      transition: top 0.16s ease;
+    }
+    .skip-link:focus { top: 0.75rem; }
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 1px;
+    }
+    .btn-y:focus-visible, .order-btn:focus-visible, .nav-cta:focus-visible {
+      outline-color: var(--red);
+    }
+
     /* ---------- gingham motifs ---------- */
     .gingham-strip {
       height: 26px; width: 100%;
@@ -372,15 +392,16 @@ const mapSrc = "https://maps.google.com/maps?q=525+DeKalb+Ave,+Brooklyn,+NY+1120
     .lede { font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem, 1.7vw, 1.35rem); line-height: 1.5; color: #2a241e; max-width: 34ch; margin: 0 0 2rem; }
     .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
 
-    .hero-fig { margin: 0; position: relative; }
+    .hero-fig { margin: 0; }
+    .hero-img-wrap { position: relative; }
     .gingham-pad {
-      position: absolute; inset: auto -6% -8% auto; width: 62%; height: 70%; z-index: 0;
+      position: absolute; inset: 0; z-index: 0; transform: translate(14px, 14px);
       background-image:
-        repeating-linear-gradient(90deg, transparent 0 var(--gh), rgba(224,35,26,.4) 0 calc(var(--gh) * 2)),
-        repeating-linear-gradient(0deg, transparent 0 var(--gh), rgba(224,35,26,.4) 0 calc(var(--gh) * 2));
-      border: 2.5px solid var(--ink);
+        repeating-linear-gradient(90deg, transparent 0 var(--gh), rgba(224,35,26,.42) 0 calc(var(--gh) * 2)),
+        repeating-linear-gradient(0deg, transparent 0 var(--gh), rgba(224,35,26,.42) 0 calc(var(--gh) * 2));
+      background-color: #fff; border: 2.5px solid var(--ink);
     }
-    .hero-fig img { position: relative; z-index: 1; width: 100%; border: 2.5px solid var(--ink); background: #fff; }
+    .hero-fig img { position: relative; z-index: 1; display: block; width: 100%; height: auto; border: 2.5px solid var(--ink); background: #fff; }
     .hero-fig figcaption { font-family: var(--serif); font-style: italic; font-size: 0.95rem; color: var(--muted); margin-top: 0.9rem; position: relative; z-index: 1; }
     .hero-fig figcaption b { font-family: var(--cond); font-style: normal; font-weight: 700; letter-spacing: 0.06em; color: var(--red); }
 
@@ -472,6 +493,21 @@ const mapSrc = "https://maps.google.com/maps?q=525+DeKalb+Ave,+Brooklyn,+NY+1120
       .group-cols { grid-template-columns: 1fr; gap: 0; }
       .sides { grid-template-columns: 1fr; gap: 0; }
       .visit-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .nav { padding: 0.6rem 1rem; }
+      .nav .brand img { height: 30px; }
+      .nav-cta { padding: 0.5rem 0.85rem; font-size: 0.72rem; }
+      .hero h1 .ln { text-shadow: 3px 3px 0 var(--red); }
+      .hero h1 .ln.red { text-shadow: 3px 3px 0 var(--ink); }
+      .block-title { text-shadow: 3px 3px 0 var(--red); }
+      .block-title .red { text-shadow: 3px 3px 0 var(--ink); }
+      .cta-row .btn { flex: 1 1 auto; justify-content: center; }
+      .order-btn { box-shadow: 4px 4px 0 var(--ink); }
+      .gingham-pad { transform: translate(9px, 9px); }
+      .foot-grid { flex-direction: column; text-align: center; }
+      .foot-links { flex-wrap: wrap; justify-content: center; }
+      .map-fig { min-height: 280px; box-shadow: 6px 6px 0 var(--red); }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }

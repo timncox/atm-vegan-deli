@@ -20,6 +20,15 @@
   "schema": {
     "type": "Restaurant",
     "extra": {
+      "image": "https://atmvegandeli.com/media/hero-sandwich.webp",
+      "hasMenu": "https://atmvegandeli.com/#menu",
+      "acceptsReservations": false,
+      "areaServed": "Brooklyn, NY",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.690758,
+        "longitude": -73.957603
+      },
       "sameAs": [
         "https://instagram.com/a.t.m.vegandeli"
       ],
